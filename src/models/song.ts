@@ -1,7 +1,25 @@
-export class Song {
-  constructor (public title: string, public authors: Array<string>, public releaseDate: Date, public duration: number, public album: string) {}
+import { SongVersion } from './song-version'
 
-  getInformations () {
-    return `Title: ${this.title}, Author: ${this.authors.join('/')}, Release date: ${this.releaseDate.toISOString()}, Duration: ${this.duration} second(s), Album: ${this.album}`
+export class Song {
+  constructor (public songVersions: Array<SongVersion> = []) {}
+
+  addVersion (songVersion: SongVersion): void {
+    this.songVersions.push(songVersion)
+    if (this.songVersions.length > 5) this.songVersions.shift()
+  }
+
+  getLastVersion (): SongVersion {
+    const version = this.songVersions[this.songVersions.length - 1]
+    if (!version) throw new Error('No version found')
+    return version
+  }
+
+  getVersion (version: number): SongVersion{
+    if (!this.songVersions[version - 1]) throw new Error('No version found')
+    return this.songVersions[version - 1]
+  }
+
+  getInformations (): string {
+    return this.songVersions.map((version, index) => `Version ${index + 1}: ${version.getInformations()}`).join(' / ')
   }
 }
